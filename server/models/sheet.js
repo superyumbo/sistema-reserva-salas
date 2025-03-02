@@ -30,9 +30,15 @@ async function getAuthClient() {
     let auth;
     
     // Comprobar si estamos en producción y tenemos credenciales en variables de entorno
-    if (process.env.GOOGLE_CREDENTIALS) {
-      // Usar credenciales desde variable de entorno
-      const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+    if (process.env.GOOGLE_CLIENT_EMAIL && process.env.GOOGLE_PRIVATE_KEY) {
+      console.log('Usando credenciales individuales desde variables de entorno');
+      
+      // Crear objeto de credenciales
+      const credentials = {
+        client_email: process.env.GOOGLE_CLIENT_EMAIL,
+        private_key: process.env.GOOGLE_PRIVATE_KEY,
+        project_id: process.env.GOOGLE_PROJECT_ID || 'vocal-eon-412301',
+      };
       
       auth = new google.auth.GoogleAuth({
         credentials,
@@ -40,6 +46,7 @@ async function getAuthClient() {
       });
     } else {
       // Usar el archivo local para desarrollo
+      console.log('Usando archivo de credenciales local');
       auth = new google.auth.GoogleAuth({
         keyFile: path.join(__dirname, '../config/credentials.json'),
         scopes: ['https://www.googleapis.com/auth/spreadsheets'],
