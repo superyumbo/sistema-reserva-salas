@@ -22,16 +22,17 @@ const HEADERS = [
   'PROMEDIO_DE_PERSONAS_EN_REUNION'
 ];
 
+/**
+ * Obtener cliente autenticado para Google API
+ */
 async function getAuthClient() {
   try {
     let auth;
     
     // Comprobar si estamos en producción y tenemos credenciales en variables de entorno
-    if (process.env.NODE_ENV === 'production' && process.env.GOOGLE_CREDENTIALS_BASE64) {
-      // Decodificar las credenciales desde Base64
-      const credentials = JSON.parse(
-        Buffer.from(process.env.GOOGLE_CREDENTIALS_BASE64, 'base64').toString()
-      );
+    if (process.env.GOOGLE_CREDENTIALS) {
+      // Usar credenciales desde variable de entorno
+      const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
       
       auth = new google.auth.GoogleAuth({
         credentials,
