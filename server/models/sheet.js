@@ -22,15 +22,28 @@ const HEADERS = [
   'PROMEDIO_DE_PERSONAS_EN_REUNION'
 ];
 
-/**
- * Obtener cliente autenticado para Google API
- */
 async function getAuthClient() {
   try {
-    const auth = new google.auth.GoogleAuth({
-      keyFile: path.join(__dirname, '../config/credentials.json'),
-      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-    });
+    let auth;
+    
+    // Comprobar si estamos en producción y tenemos credenciales en variables de entorno
+    if (process.env.NODE_ENV === 'production' && process.env.GOOGLE_CREDENTIALS_BASE64) {
+      // Decodificar las credenciales desde Base64
+      const credentials = JSON.parse(
+        Buffer.from(process.env.GOOGLE_CREDENTIALS_BASE64, 'base64').toString()
+      );
+      
+      auth = new google.auth.GoogleAuth({
+        credentials,
+        scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+      });
+    } else {
+      // Usar el archivo local para desarrollo
+      auth = new google.auth.GoogleAuth({
+        keyFile: path.join(__dirname, '../config/credentials.json'),
+        scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+      });
+    }
     
     return await auth.getClient();
   } catch (error) {
